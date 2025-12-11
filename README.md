@@ -370,6 +370,70 @@ curl -X POST https://tu-app.vercel.app/api/championships/champ1/categories \
   }'
 ```
 
+## 🚀 Despliegue
+
+### Desplegar en GitHub
+
+1. **Usando el script automatizado (recomendado):**
+   ```powershell
+   .\deploy_completo.ps1
+   ```
+
+2. **Manual:**
+   - Crea un repositorio en GitHub
+   - Ejecuta:
+   ```powershell
+   git add .
+   git commit -m "Initial commit"
+   git remote add origin https://github.com/tu-usuario/tu-repo.git
+   git branch -M main
+   git push -u origin main
+   ```
+
+### Desplegar en Vercel
+
+1. **Desde la interfaz web:**
+   - Ve a https://vercel.com/new
+   - Conecta tu repositorio de GitHub
+   - Vercel detectará automáticamente la configuración
+
+2. **Desde la CLI:**
+   ```powershell
+   npm install -g vercel
+   vercel login
+   vercel
+   ```
+
+Para más detalles, consulta [DEPLOY.md](DEPLOY.md)
+
+## 📡 API REST
+
+El proyecto incluye una API REST completa usando Flask. Una vez desplegado en Vercel, puedes acceder a:
+
+- `GET /` - Información de la API
+- `POST /api/championships` - Crear campeonato
+- `GET /api/championships` - Listar campeonatos
+- `GET /api/championships/<id>` - Obtener campeonato
+- `POST /api/championships/<id>/categories` - Agregar categoría
+- `POST /api/championships/<id>/results` - Registrar resultado
+- `GET /api/championships/<id>/standings/<category>` - Tabla de posiciones
+- `GET /api/championships/<id>/fixture/<category>` - Fixture
+- `POST /api/championships/<id>/penalty` - Aplicar multa
+
+## 📝 Archivos del Proyecto
+
+- `championship.py` - Clase principal Championship
+- `category.py` - Gestión de categorías
+- `team.py` - Clase Team
+- `match.py` - Clase Match
+- `standings.py` - Tabla de posiciones
+- `fixture_generator.py` - Generador de fixtures
+- `main.py` - Ejemplos de uso
+- `app.py` - API Flask
+- `api/index.py` - Punto de entrada para Vercel
+- `vercel.json` - Configuración de Vercel
+- `requirements.txt` - Dependencias
+
 ## Licencia
 
 Este proyecto es de código abierto y está disponible para uso libre.
