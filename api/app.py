@@ -1,37 +1,10 @@
 """
 API Flask para el Sistema de Gestión de Campeonatos de Básquetbol.
-Versión con mejor manejo de errores para diagnóstico.
+Versión simplificada para diagnóstico.
 """
 
-import sys
-import os
-
-# Configurar paths
-parent_dir = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-if parent_dir not in sys.path:
-    sys.path.insert(0, parent_dir)
-
-from flask import Flask, request, jsonify
+from flask import Flask, jsonify
 from flask_cors import CORS
-
-# Intentar importar Championship con manejo de errores
-Championship = None
-import_error = None
-
-try:
-    # Intentar importar desde el mismo directorio (api/)
-    from championship import Championship
-except ImportError as e1:
-    try:
-        # Intentar importar desde api.championship
-        from api.championship import Championship
-    except ImportError as e2:
-        try:
-            # Intentar desde el directorio padre
-            sys.path.insert(0, parent_dir)
-            from championship import Championship
-        except ImportError as e3:
-            import_error = f"Error 1: {e1}, Error 2: {e2}, Error 3: {e3}"
 
 app = Flask(__name__)
 CORS(app)
@@ -43,27 +16,12 @@ championships = {}
 @app.route('/')
 def index():
     """Endpoint raíz con información de la API."""
-    status = {
+    return jsonify({
         "message": "API de Gestión de Campeonatos de Básquetbol",
         "version": "1.0.0",
         "status": "operational",
-        "championship_imported": Championship is not None,
-        "import_error": import_error if import_error else None
-    }
-    
-    if Championship:
-        status["endpoints"] = {
-            "POST /api/championships": "Crear un nuevo campeonato",
-            "GET /api/championships": "Listar todos los campeonatos",
-            "GET /api/championships/<id>": "Obtener un campeonato",
-            "POST /api/championships/<id>/categories": "Agregar categoría",
-            "POST /api/championships/<id>/results": "Registrar resultado",
-            "GET /api/championships/<id>/standings/<category>": "Obtener tabla de posiciones",
-            "GET /api/championships/<id>/fixture/<category>": "Obtener fixture",
-            "POST /api/championships/<id>/penalty": "Aplicar multa"
-        }
-    
-    return jsonify(status)
+        "test": "Si ves esto, Flask está funcionando correctamente"
+    })
 
 
 @app.route('/health')
@@ -71,16 +29,29 @@ def health():
     """Endpoint de salud."""
     return jsonify({
         "status": "healthy",
-        "championship_available": Championship is not None
+        "message": "API funcionando"
     })
 
 
-# Solo definir endpoints si Championship está disponible
-if Championship:
+# Intentar importar Championship solo cuando sea necesario
+try:
+    import sys
+    import os
+    
+    # Configurar paths
+    current_dir = os.path.dirname(os.path.abspath(__file__))
+    if current_dir not in sys.path:
+        sys.path.insert(0, current_dir)
+    
+    # Intentar importar desde el mismo directorio
+    from championship import Championship
+    
+    # Si llegamos aquí, Championship está disponible
     @app.route('/api/championships', methods=['POST'])
     def create_championship():
         """Crear un nuevo campeonato."""
-        data = request.json
+        from flask import request
+        data = request.json or {}
         champ_id = data.get('id', f"champ_{len(championships) + 1}")
         name = data.get('name', 'Campeonato')
         rounds = data.get('rounds', 1)
@@ -128,10 +99,11 @@ if Championship:
     @app.route('/api/championships/<champ_id>/categories', methods=['POST'])
     def add_category(champ_id):
         """Agregar una categoría a un campeonato."""
+        from flask import request
         if champ_id not in championships:
             return jsonify({"success": False, "error": "Campeonato no encontrado"}), 404
         
-        data = request.json
+        data = request.json or {}
         category_name = data.get('name')
         team_names = data.get('teams', [])
         num_teams = data.get('num_teams')
@@ -161,10 +133,11 @@ if Championship:
     @app.route('/api/championships/<champ_id>/results', methods=['POST'])
     def register_result(champ_id):
         """Registrar el resultado de un partido."""
+        from flask import request
         if champ_id not in championships:
             return jsonify({"success": False, "error": "Campeonato no encontrado"}), 404
         
-        data = request.json
+        data = request.json or {}
         category_name = data.get('category')
         team_a = data.get('team_a')
         team_b = data.get('team_b')
@@ -209,6 +182,7 @@ if Championship:
         if category is None:
             return jsonify({"success": False, "error": "Categoría no encontrada"}), 404
         
+        from flask import request
         round_number = request.args.get('round', type=int)
         if round_number:
             matches = category.get_matches_by_round(round_number)
@@ -224,10 +198,11 @@ if Championship:
     @app.route('/api/championships/<champ_id>/penalty', methods=['POST'])
     def apply_penalty(champ_id):
         """Aplicar una multa o bonificación de puntos."""
+        from flask import request
         if champ_id not in championships:
             return jsonify({"success": False, "error": "Campeonato no encontrado"}), 404
         
-        data = request.json
+        data = request.json or {}
         category_name = data.get('category')
         team_name = data.get('team')
         points = data.get('points')
@@ -235,17 +210,17 @@ if Championship:
         championships[champ_id].apply_penalty(category_name, team_name, points)
         return jsonify({"success": True, "message": "Multa aplicada"})
 
-else:
-    # Si Championship no está disponible, crear endpoint de error
+except ImportError as e:
+    # Si Championship no se puede importar, crear endpoint de error informativo
     @app.route('/api/championships', methods=['GET', 'POST'])
     def championship_error():
         return jsonify({
             "error": "Championship module no disponible",
-            "import_error": import_error,
-            "message": "Verifica que los módulos estén en api/"
+            "import_error": str(e),
+            "message": "Los endpoints básicos funcionan, pero Championship no está disponible"
         }), 503
 
 
-# Exportar para Vercel - Vercel busca 'handler' o 'application'
+# Exportar para Vercel
 handler = app
 application = app
