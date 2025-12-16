@@ -19,20 +19,26 @@ championships = {}
 @app.route('/')
 def index():
     """Endpoint raíz con información de la API."""
-    return jsonify({
-        "message": "API de Gestión de Campeonatos de Básquetbol",
-        "version": "1.0.0",
-        "endpoints": {
-            "POST /api/championships": "Crear un nuevo campeonato",
-            "GET /api/championships": "Listar todos los campeonatos",
-            "GET /api/championships/<id>": "Obtener un campeonato",
-            "POST /api/championships/<id>/categories": "Agregar categoría",
-            "POST /api/championships/<id>/results": "Registrar resultado",
-            "GET /api/championships/<id>/standings/<category>": "Obtener tabla de posiciones",
-            "GET /api/championships/<id>/fixture/<category>": "Obtener fixture",
-            "POST /api/championships/<id>/penalty": "Aplicar multa"
-        }
-    })
+    # Intentar servir la interfaz web si existe
+    try:
+        from flask import render_template
+        return render_template('index.html')
+    except:
+        # Si no hay template, devolver JSON
+        return jsonify({
+            "message": "API de Gestión de Campeonatos de Básquetbol",
+            "version": "1.0.0",
+            "endpoints": {
+                "POST /api/championships": "Crear un nuevo campeonato",
+                "GET /api/championships": "Listar todos los campeonatos",
+                "GET /api/championships/<id>": "Obtener un campeonato",
+                "POST /api/championships/<id>/categories": "Agregar categoría",
+                "POST /api/championships/<id>/results": "Registrar resultado",
+                "GET /api/championships/<id>/standings/<category>": "Obtener tabla de posiciones",
+                "GET /api/championships/<id>/fixture/<category>": "Obtener fixture",
+                "POST /api/championships/<id>/penalty": "Aplicar multa"
+            }
+        })
 
 
 @app.route('/api/championships', methods=['POST'])
