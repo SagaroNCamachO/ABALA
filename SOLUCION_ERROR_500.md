@@ -58,3 +58,4 @@ flask-cors==4.0.0
 3. Prueba el endpoint raíz: `https://tu-proyecto.vercel.app/`
 4. Si aún hay error, revisa la respuesta JSON para ver detalles del error
 
+

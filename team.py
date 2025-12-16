@@ -95,3 +95,4 @@ class Team:
     def __repr__(self) -> str:
         return f"Team(name='{self.name}', category='{self.category}', points={self.points})"
 
+

@@ -101,3 +101,4 @@ class Standings:
     def __repr__(self) -> str:
         return f"Standings(category='{self.category}', teams={len(self.teams)})"
 
+

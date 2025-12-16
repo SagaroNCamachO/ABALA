@@ -166,3 +166,4 @@ class Championship:
     def __repr__(self) -> str:
         return f"Championship(name='{self.name}', rounds={self.rounds}, categories={len(self.categories)})"
 
+
