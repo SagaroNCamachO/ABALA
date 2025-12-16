@@ -16,22 +16,25 @@ from flask_cors import CORS
 import json
 
 # Importar módulos del proyecto
+# Primero intentar desde el directorio api (donde están los archivos copiados)
 try:
     from championship import Championship
 except ImportError:
-    # Si no se puede importar desde el directorio padre, intentar importar directamente
-    # Esto requiere que los módulos estén en el mismo directorio o en el path
-    import importlib.util
-    
-    # Intentar cargar championship.py desde el directorio padre
-    championship_path = os.path.join(parent_dir, 'championship.py')
-    if os.path.exists(championship_path):
-        spec = importlib.util.spec_from_file_location("championship", championship_path)
-        championship_module = importlib.util.module_from_spec(spec)
-        spec.loader.exec_module(championship_module)
-        Championship = championship_module.Championship
-    else:
-        raise ImportError("No se pudo encontrar championship.py")
+    # Si falla, intentar desde el directorio padre
+    try:
+        sys.path.insert(0, parent_dir)
+        from championship import Championship
+    except ImportError:
+        # Último recurso: cargar dinámicamente
+        import importlib.util
+        championship_path = os.path.join(parent_dir, 'championship.py')
+        if os.path.exists(championship_path):
+            spec = importlib.util.spec_from_file_location("championship", championship_path)
+            championship_module = importlib.util.module_from_spec(spec)
+            spec.loader.exec_module(championship_module)
+            Championship = championship_module.Championship
+        else:
+            raise ImportError("No se pudo encontrar championship.py")
 
 app = Flask(__name__)
 CORS(app)  # Permitir CORS para desarrollo
