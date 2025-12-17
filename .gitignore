@@ -9,6 +9,12 @@ yarn.lock
 *.d.ts
 *.d.ts.map
 !api/index.js
+models/
+utils/
+api.d.ts
+api.d.ts.map
+api.js
+api.js.map
 
 # TypeScript
 *.tsbuildinfo
