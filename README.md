@@ -2,7 +2,7 @@
 
 Sistema completo y robusto para administrar campeonatos de básquetbol con múltiples categorías, generación automática de fixtures y gestión de tablas de posiciones.
 
-## Características
+## 🚀 Características
 
 ### ✅ Configuración del Campeonato
 - Configuración de cantidad de vueltas (1 o más)
@@ -27,166 +27,197 @@ Sistema completo y robusto para administrar campeonatos de básquetbol con múlt
 - Actualización automática de estadísticas
 - Actualización automática de tabla de posiciones
 
-## Estructura del Proyecto
+## 🛠️ Tecnologías
+
+- **TypeScript** - Lenguaje principal
+- **Node.js** - Runtime
+- **Express** - Framework web para API REST
+- **Vercel** - Plataforma de deployment
+
+## 📁 Estructura del Proyecto
 
 ```
 .
-├── championship.py      # Clase principal Championship
-├── category.py          # Clase Category (gestión de categorías)
-├── team.py              # Clase Team (equipos)
-├── match.py             # Clase Match (partidos)
-├── standings.py         # Clase Standings (tabla de posiciones)
-├── fixture_generator.py # Generador de fixtures
-├── main.py              # Archivo principal con ejemplos
-└── README.md           # Este archivo
+├── src/
+│   ├── models/
+│   │   ├── Team.ts          # Clase Team (equipos)
+│   │   ├── Match.ts          # Clase Match (partidos)
+│   │   ├── Standings.ts      # Clase Standings (tabla de posiciones)
+│   │   ├── Category.ts       # Clase Category (gestión de categorías)
+│   │   └── Championship.ts   # Clase principal Championship
+│   ├── utils/
+│   │   └── FixtureGenerator.ts # Generador de fixtures
+│   └── api.ts                # API REST con Express
+├── api/
+│   └── index.ts              # Punto de entrada para Vercel
+├── package.json              # Dependencias y scripts
+├── tsconfig.json            # Configuración de TypeScript
+├── vercel.json              # Configuración de Vercel
+└── README.md                # Este archivo
 ```
 
-## Instalación
+## 📦 Instalación
 
-No se requieren dependencias externas. El sistema utiliza solo la biblioteca estándar de Python 3.6+.
+### Requisitos
+- Node.js 18.0.0 o superior
+- npm o yarn
+
+### Pasos
+
+1. **Clonar el repositorio:**
+```bash
+git clone https://github.com/tu-usuario/ABALA.git
+cd ABALA
+```
+
+2. **Instalar dependencias:**
+```bash
+npm install
+```
+
+3. **Compilar TypeScript:**
+```bash
+npm run build
+```
+
+## 🚀 Uso
+
+### Desarrollo Local
+
+1. **Ejecutar en modo desarrollo:**
+```bash
+npm run dev
+```
+
+El servidor estará disponible en `http://localhost:3000`
+
+2. **Compilar y ejecutar:**
+```bash
+npm run build
+npm start
+```
+
+### API REST
+
+Una vez ejecutando, la API estará disponible en `http://localhost:3000`
+
+#### Endpoints Disponibles
+
+- `GET /` - Información de la API
+- `GET /health` - Verificar estado de la API
+- `POST /api/championships` - Crear un nuevo campeonato
+- `GET /api/championships` - Listar todos los campeonatos
+- `GET /api/championships/:id` - Obtener un campeonato
+- `POST /api/championships/:id/categories` - Agregar categoría
+- `POST /api/championships/:id/results` - Registrar resultado
+- `GET /api/championships/:id/standings/:category` - Obtener tabla de posiciones
+- `GET /api/championships/:id/fixture/:category` - Obtener fixture
+- `POST /api/championships/:id/penalty` - Aplicar multa
+
+### Ejemplos de Uso de la API
+
+#### 1. Crear un Campeonato
 
 ```bash
-# Clonar o descargar el proyecto
-# No se requiere instalación adicional
+curl -X POST http://localhost:3000/api/championships \
+  -H "Content-Type: application/json" \
+  -d '{
+    "id": "champ1",
+    "name": "Campeonato Local 2024",
+    "rounds": 2,
+    "points_per_win": 2,
+    "points_per_loss": 0
+  }'
 ```
 
-## Uso Básico
+#### 2. Agregar una Categoría
 
-### Crear un Campeonato
-
-```python
-from championship import Championship
-
-# Crear campeonato con 2 vueltas
-champ = Championship(
-    name="Campeonato Local 2024",
-    rounds=2,
-    points_per_win=2,
-    points_per_loss=0
-)
+```bash
+curl -X POST http://localhost:3000/api/championships/champ1/categories \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "TC",
+    "teams": ["Los Leones", "Los Tigres", "Los Halcones", "Las Águilas"]
+  }'
 ```
 
-### Agregar Categorías
+O con número de equipos (nombres automáticos):
 
-```python
-# Opción 1: Agregar con número de equipos (nombres automáticos)
-champ.add_category("TC", num_teams=4)
-champ.add_category("Senior", num_teams=3)
-
-# Opción 2: Agregar con nombres de equipos personalizados
-champ.add_category_with_teams(
-    "Super Senior",
-    ["Equipo A", "Equipo B", "Equipo C", "Equipo D"]
-)
-
-# Opción 3: Con configuración personalizada de puntos
-champ.add_category_with_teams(
-    "TC",
-    ["Los Leones", "Los Tigres", "Los Halcones"],
-    points_per_win=3,  # 3 puntos por victoria
-    points_per_loss=0
-)
+```bash
+curl -X POST http://localhost:3000/api/championships/champ1/categories \
+  -H "Content-Type: application/json" \
+  -d '{
+    "name": "Senior",
+    "num_teams": 4
+  }'
 ```
 
-### Registrar Resultados
+#### 3. Registrar un Resultado
 
-```python
-# Registrar resultado de un partido
-champ.register_match_result(
-    category_name="TC",
-    team_a="Los Leones",
-    team_b="Los Tigres",
-    round_number=1,
-    score_a=95,  # Puntos del equipo A
-    score_b=82   # Puntos del equipo B
-)
+```bash
+curl -X POST http://localhost:3000/api/championships/champ1/results \
+  -H "Content-Type: application/json" \
+  -d '{
+    "category": "TC",
+    "team_a": "Los Leones",
+    "team_b": "Los Tigres",
+    "round_number": 1,
+    "score_a": 95,
+    "score_b": 82
+  }'
 ```
 
-### Consultar Tabla de Posiciones
+#### 4. Obtener Tabla de Posiciones
 
-```python
-# Obtener tabla de posiciones ordenada
-standings = champ.get_standings("TC")
-
-for pos, team in enumerate(standings, 1):
-    print(f"{pos}. {team.name} - {team.points} puntos")
+```bash
+curl http://localhost:3000/api/championships/champ1/standings/TC
 ```
 
-### Aplicar Multas/Bonificaciones
+#### 5. Obtener Fixture
 
-```python
-# Restar 2 puntos (multa)
-champ.apply_penalty("TC", "Los Leones", 2)
-
-# Sumar 1 punto (bonificación)
-champ.apply_penalty("TC", "Los Tigres", -1)
-```
-
-### Obtener Fixture
-
-```python
-category = champ.get_category("TC")
-
+```bash
 # Todos los partidos
-all_matches = category.matches
+curl http://localhost:3000/api/championships/champ1/fixture/TC
 
 # Partidos de una vuelta específica
-matches_round_1 = category.get_matches_by_round(1)
-
-# Partidos de un equipo
-team_matches = category.get_matches_by_team("Los Leones")
+curl http://localhost:3000/api/championships/champ1/fixture/TC?round=1
 ```
 
-### Exportar a JSON
-
-```python
-import json
-
-# Exportar todo el campeonato
-data = champ.to_dict()
-json_output = json.dumps(data, indent=2, ensure_ascii=False)
-
-# Guardar en archivo
-with open("championship.json", "w", encoding="utf-8") as f:
-    f.write(json_output)
-```
-
-## Ejecutar Ejemplos
-
-El archivo `main.py` contiene ejemplos completos de uso:
+#### 6. Aplicar Multa/Bonificación
 
 ```bash
-python main.py
+curl -X POST http://localhost:3000/api/championships/champ1/penalty \
+  -H "Content-Type: application/json" \
+  -d '{
+    "category": "TC",
+    "team": "Los Leones",
+    "points": 2
+  }'
 ```
 
-Esto ejecutará tres ejemplos:
-1. **Ejemplo básico**: Campeonato simple con una vuelta
-2. **Ejemplo completo**: Campeonato con múltiples vueltas y equipos personalizados
-3. **Ejemplo de exportación**: Generación de archivo JSON
-
-## Clases Principales
+## 🏗️ Clases Principales
 
 ### Championship
 Clase principal que gestiona el campeonato completo.
 
 **Métodos principales:**
-- `add_category()`: Agrega categoría con número de equipos
-- `add_category_with_teams()`: Agrega categoría con nombres de equipos
-- `register_match_result()`: Registra resultado de partido
-- `get_standings()`: Obtiene tabla de posiciones
-- `apply_penalty()`: Aplica multa/bonificación
-- `to_dict()`: Exporta a diccionario/JSON
+- `addCategory()`: Agrega categoría con número de equipos
+- `addCategoryWithTeams()`: Agrega categoría con nombres de equipos
+- `registerMatchResult()`: Registra resultado de partido
+- `getStandings()`: Obtiene tabla de posiciones
+- `applyPenalty()`: Aplica multa/bonificación
+- `toDict()`: Exporta a objeto JSON
 
 ### Category
 Gestiona una categoría con sus equipos, partidos y tabla.
 
 **Métodos principales:**
-- `add_teams()`: Agrega equipos
-- `generate_fixture()`: Genera fixture automáticamente
-- `register_match_result()`: Registra resultado
-- `get_standings()`: Obtiene tabla de posiciones
-- `get_matches_by_round()`: Filtra partidos por vuelta
-- `get_matches_by_team()`: Filtra partidos por equipo
+- `addTeams()`: Agrega equipos
+- `generateFixture()`: Genera fixture automáticamente
+- `registerMatchResult()`: Registra resultado
+- `getStandings()`: Obtiene tabla de posiciones
+- `getMatchesByRound()`: Filtra partidos por vuelta
+- `getMatchesByTeam()`: Filtra partidos por equipo
 
 ### Team
 Representa un equipo con sus estadísticas.
@@ -198,29 +229,29 @@ Representa un equipo con sus estadísticas.
 - `pf`: Puntos a favor
 - `pc`: Puntos en contra
 - `points`: Puntos totales
-- `penalty_points`: Puntos de multa
+- `penaltyPoints`: Puntos de multa
 
 ### Match
 Representa un partido entre dos equipos.
 
 **Propiedades:**
-- `team_a`, `team_b`: Equipos participantes
-- `round_number`: Número de vuelta
-- `match_type`: 'ida' o 'vuelta'
+- `teamA`, `teamB`: Equipos participantes
+- `roundNumber`: Número de vuelta
+- `matchType`: 'ida' o 'vuelta'
 - `played`: Si el partido ya se jugó
-- `score_a`, `score_b`: Resultados
+- `scoreA`, `scoreB`: Resultados
 - `winner`: Equipo ganador
 
 ### Standings
 Gestiona la tabla de posiciones de una categoría.
 
 **Métodos principales:**
-- `add_team()`: Agrega equipo
-- `update_standings()`: Recalcula posiciones
-- `get_sorted_standings()`: Obtiene tabla ordenada
-- `apply_penalty()`: Aplica multa/bonificación
+- `addTeam()`: Agrega equipo
+- `updateStandings()`: Recalcula posiciones
+- `getSortedStandings()`: Obtiene tabla ordenada
+- `applyPenalty()`: Aplica multa/bonificación
 
-## Algoritmo de Fixture
+## 🔄 Algoritmo de Fixture
 
 El sistema utiliza el algoritmo **Round-Robin** para generar fixtures:
 
@@ -229,7 +260,7 @@ El sistema utiliza el algoritmo **Round-Robin** para generar fixtures:
 - **Localía**: Se alterna automáticamente
 - **Ida y vuelta**: Se generan automáticamente según el número de vueltas
 
-## Criterios de Desempate
+## 📊 Criterios de Desempate
 
 La tabla de posiciones se ordena por:
 1. **Puntos totales** (descendente)
@@ -237,208 +268,61 @@ La tabla de posiciones se ordena por:
 3. **Puntos a favor** (descendente)
 4. **Nombre** (alfabético)
 
-## Extensibilidad
+## 🚀 Despliegue
+
+### Vercel (Recomendado)
+
+1. **Instalar Vercel CLI:**
+```bash
+npm install -g vercel
+```
+
+2. **Iniciar sesión:**
+```bash
+vercel login
+```
+
+3. **Desplegar:**
+```bash
+vercel
+```
+
+4. **Para producción:**
+```bash
+vercel --prod
+```
+
+### Alternativa: Desde GitHub
+
+1. Sube tu código a GitHub
+2. Ve a [vercel.com](https://vercel.com)
+3. Conecta tu repositorio
+4. Vercel detectará automáticamente la configuración
+5. Haz clic en "Deploy"
+
+El archivo `vercel.json` ya está configurado para deployment automático.
+
+## 📝 Scripts Disponibles
+
+- `npm run dev` - Ejecutar en modo desarrollo con hot-reload
+- `npm run build` - Compilar TypeScript a JavaScript
+- `npm start` - Ejecutar la aplicación compilada
+- `npm run type-check` - Verificar tipos sin compilar
+
+## 🔧 Extensibilidad
 
 El sistema está diseñado para ser extensible:
 
 - **Nuevas reglas**: Agregar métodos en las clases correspondientes
 - **Nuevos tipos de partidos**: Extender la clase `Match`
-- **Nuevos criterios de desempate**: Modificar `get_sorted_standings()` en `Standings`
-- **Integración con base de datos**: Los métodos `to_dict()` facilitan la serialización
+- **Nuevos criterios de desempate**: Modificar `getSortedStandings()` en `Standings`
+- **Integración con base de datos**: Los métodos `toDict()` facilitan la serialización
 - **Interfaz gráfica**: La estructura modular permite fácil integración
 
-## Ejemplo Completo
-
-```python
-from championship import Championship
-
-# 1. Crear campeonato
-champ = Championship("Campeonato 2024", rounds=2, points_per_win=2)
-
-# 2. Agregar categorías
-champ.add_category_with_teams(
-    "TC",
-    ["Leones", "Tigres", "Halcones", "Águilas"]
-)
-
-# 3. El fixture se genera automáticamente
-category = champ.get_category("TC")
-print(f"Total de partidos: {len(category.matches)}")
-
-# 4. Registrar resultados
-champ.register_match_result("TC", "Leones", "Tigres", 1, 95, 82)
-champ.register_match_result("TC", "Halcones", "Águilas", 1, 88, 75)
-
-# 5. Ver tabla de posiciones
-standings = champ.get_standings("TC")
-for pos, team in enumerate(standings, 1):
-    print(f"{pos}. {team.name}: {team.points} pts")
-
-# 6. Aplicar multa
-champ.apply_penalty("TC", "Leones", 2)
-
-# 7. Exportar
-import json
-with open("champ.json", "w") as f:
-    json.dump(champ.to_dict(), f, indent=2, ensure_ascii=False)
-```
-
-## Despliegue
-
-### GitHub
-
-1. Inicializar el repositorio (si no está inicializado):
-```bash
-git init
-git add .
-git commit -m "Initial commit: Sistema de gestión de campeonatos"
-```
-
-2. Conectar con GitHub:
-```bash
-git remote add origin https://github.com/TU_USUARIO/TU_REPOSITORIO.git
-git branch -M main
-git push -u origin main
-```
-
-### Vercel
-
-Este proyecto incluye una API REST construida con Flask que puede desplegarse en Vercel.
-
-#### Pasos para desplegar en Vercel:
-
-1. **Instalar Vercel CLI** (si no lo tienes):
-```bash
-npm install -g vercel
-```
-
-2. **Iniciar sesión en Vercel**:
-```bash
-vercel login
-```
-
-3. **Desplegar el proyecto**:
-```bash
-vercel
-```
-
-4. **Para producción**:
-```bash
-vercel --prod
-```
-
-#### Alternativa: Desplegar desde GitHub
-
-1. Sube tu código a GitHub
-2. Ve a [vercel.com](https://vercel.com)
-3. Conecta tu repositorio de GitHub
-4. Vercel detectará automáticamente la configuración de Python
-5. Haz clic en "Deploy"
-
-### API Endpoints
-
-Una vez desplegado, la API estará disponible en:
-- `GET /` - Información de la API
-- `POST /api/championships` - Crear campeonato
-- `GET /api/championships` - Listar campeonatos
-- `GET /api/championships/<id>` - Obtener campeonato
-- `POST /api/championships/<id>/categories` - Agregar categoría
-- `POST /api/championships/<id>/results` - Registrar resultado
-- `GET /api/championships/<id>/standings/<category>` - Tabla de posiciones
-- `GET /api/championships/<id>/fixture/<category>` - Fixture
-- `POST /api/championships/<id>/penalty` - Aplicar multa
-
-### Ejemplo de uso de la API
-
-```bash
-# Crear campeonato
-curl -X POST https://tu-app.vercel.app/api/championships \
-  -H "Content-Type: application/json" \
-  -d '{
-    "id": "champ1",
-    "name": "Campeonato 2024",
-    "rounds": 2,
-    "points_per_win": 2
-  }'
-
-# Agregar categoría
-curl -X POST https://tu-app.vercel.app/api/championships/champ1/categories \
-  -H "Content-Type: application/json" \
-  -d '{
-    "name": "TC",
-    "teams": ["Equipo A", "Equipo B", "Equipo C"]
-  }'
-```
-
-## 🚀 Despliegue
-
-### Desplegar en GitHub
-
-1. **Usando el script automatizado (recomendado):**
-   ```powershell
-   .\deploy_completo.ps1
-   ```
-
-2. **Manual:**
-   - Crea un repositorio en GitHub
-   - Ejecuta:
-   ```powershell
-   git add .
-   git commit -m "Initial commit"
-   git remote add origin https://github.com/tu-usuario/tu-repo.git
-   git branch -M main
-   git push -u origin main
-   ```
-
-### Desplegar en Vercel
-
-1. **Desde la interfaz web:**
-   - Ve a https://vercel.com/new
-   - Conecta tu repositorio de GitHub
-   - Vercel detectará automáticamente la configuración
-
-2. **Desde la CLI:**
-   ```powershell
-   npm install -g vercel
-   vercel login
-   vercel
-   ```
-
-Para más detalles, consulta [DEPLOY.md](DEPLOY.md)
-
-## 📡 API REST
-
-El proyecto incluye una API REST completa usando Flask. Una vez desplegado en Vercel, puedes acceder a:
-
-- `GET /` - Información de la API
-- `POST /api/championships` - Crear campeonato
-- `GET /api/championships` - Listar campeonatos
-- `GET /api/championships/<id>` - Obtener campeonato
-- `POST /api/championships/<id>/categories` - Agregar categoría
-- `POST /api/championships/<id>/results` - Registrar resultado
-- `GET /api/championships/<id>/standings/<category>` - Tabla de posiciones
-- `GET /api/championships/<id>/fixture/<category>` - Fixture
-- `POST /api/championships/<id>/penalty` - Aplicar multa
-
-## 📝 Archivos del Proyecto
-
-- `championship.py` - Clase principal Championship
-- `category.py` - Gestión de categorías
-- `team.py` - Clase Team
-- `match.py` - Clase Match
-- `standings.py` - Tabla de posiciones
-- `fixture_generator.py` - Generador de fixtures
-- `main.py` - Ejemplos de uso
-- `app.py` - API Flask
-- `api/index.py` - Punto de entrada para Vercel
-- `vercel.json` - Configuración de Vercel
-- `requirements.txt` - Dependencias
-
-## Licencia
+## 📄 Licencia
 
 Este proyecto es de código abierto y está disponible para uso libre.
 
-## Autor
+## 👤 Autor
 
 Sistema desarrollado para gestión de campeonatos de básquetbol.
-
